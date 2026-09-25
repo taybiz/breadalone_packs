@@ -1,0 +1,3 @@
+# No build artifacts — this is a data/kit repo.
+.DS_Store
+*.log
