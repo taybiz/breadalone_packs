@@ -118,6 +118,15 @@ sources/               # raw source texts the packs were built from
   usfm/                #   per-version USFM zips (eBible.org)
   gutenberg/           #   plain-text classics (Project Gutenberg)
   PROVENANCE.md        #   provenance & licensing
-FORMAT.md              # pack JSON schema (the contract)
+schema/                # JSON Schema contracts
+  pack.schema.json     #   validates a single pack file
+  catalog.schema.json  #   validates versions.json
+tools/
+  validate.py          #   local/CI validator over the whole tree
+FORMAT.md              # pack JSON schema (the contract, human-readable)
 README.md              # this file
 ```
+
+The format is **machine-enforced**: see `schema/` and `tools/validate.py` in
+[FORMAT.md](FORMAT.md). CI runs the validator on every push, so a malformed pack or a
+catalog/pack mismatch fails the build rather than shipping.

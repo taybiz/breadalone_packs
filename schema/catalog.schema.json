@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/taybiz/breadalone_packs/blob/main/schema/catalog.schema.json",
+  "title": "Breadalone pack catalog (versions.json)",
+  "description": "The pack source catalog. A client reads this first, learns what versions are available, then fetches individual packs (~<id>.json).",
+  "type": "object",
+  "required": ["format", "versions"],
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "type": "integer",
+      "const": 1,
+      "description": "Catalog layout version."
+    },
+    "versions": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/catalogVersion" }
+    }
+  },
+  "$defs": {
+    "catalogVersion": {
+      "type": "object",
+      "required": [
+        "id", "name", "abbr", "language", "languageCode", "canon",
+        "year", "original", "bundled", "source", "notes",
+        "verseCount", "chapterCount", "bookCount", "packBytes", "asset"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable id; matches the pack's version.id and filename <id>.json."
+        },
+        "name":         { "type": "string" },
+        "abbr":         { "type": "string" },
+        "language":     { "type": "string" },
+        "languageCode": { "type": "string", "description": "ISO 639-1 code, e.g. en." },
+        "canon": {
+          "type": "string",
+          "enum": ["protestant", "catholic", "orthodox", "jewish"]
+        },
+        "year":        { "type": ["integer", "null"] },
+        "original":    { "type": "boolean" },
+        "bundled":     { "type": "boolean", "description": "True = shipped in the app binary; false = downloadable on demand." },
+        "source":      { "type": "string", "description": "Provenance shown in Settings." },
+        "notes":       { "type": "string" },
+        "verseCount":  { "type": "integer", "minimum": 1 },
+        "chapterCount": { "type": "integer", "minimum": 1 },
+        "bookCount":   { "type": "integer", "minimum": 1 },
+        "packBytes":   { "type": "integer", "minimum": 1, "description": "Real byte size of the pack file (unlike the pack's own header, which carries 0)." },
+        "asset":       { "type": "string", "description": "Asset path, e.g. assets/bible/<id>.json." }
+      }
+    }
+  }
+}

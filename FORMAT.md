@@ -6,6 +6,16 @@ stable, and text-only.
 
 > Format verified against the 30 shipped packs (2026-09-25).
 
+**Machine-enforced schema:** this format is defined as JSON Schema so it can be validated
+automatically (not just documented):
+
+- [`schema/pack.schema.json`](schema/pack.schema.json) — validates an individual pack file.
+- [`schema/catalog.schema.json`](schema/catalog.schema.json) — validates the `versions.json` catalog.
+- [`tools/validate.py`](tools/validate.py) — runs both over the whole `packs/` tree and cross-checks
+  catalog↔pack file agreement. Run it locally `python3 tools/validate.py`, or let CI enforce it
+  (see `.github/workflows/validate.yml`). Any tool implementing JSON Schema (draft 2020-12) can
+  validate against the same files.
+
 ---
 
 ## Top level

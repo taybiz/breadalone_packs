@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/taybiz/breadalone_packs/blob/main/schema/pack.schema.json",
+  "title": "Breadalone pack",
+  "description": "A single Breadalone Bible pack: the full text of one version in compact JSON. This is the contract every pack source must satisfy (format 1).",
+  "type": "object",
+  "required": ["format", "version", "books"],
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "type": "integer",
+      "const": 1,
+      "description": "Pack layout version. Breaking schema changes bump this integer."
+    },
+    "version": { "$ref": "#/$defs/version" },
+    "books": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/book" }
+    }
+  },
+  "$defs": {
+    "version": {
+      "type": "object",
+      "required": [
+        "id", "name", "abbr", "language", "languageCode", "canon",
+        "verseCount", "chapterCount", "bookCount", "source",
+        "packBytes", "original", "year", "asset", "bundled", "notes"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable identifier; matches the catalog entry id and filename <id>.json."
+        },
+        "name":         { "type": "string" },
+        "abbr":         { "type": "string", "description": "Short abbreviation, e.g. KJV." },
+        "language":     { "type": "string" },
+        "languageCode": { "type": "string", "description": "ISO 639-1 code, e.g. en." },
+        "canon": {
+          "type": "string",
+          "enum": ["protestant", "catholic", "orthodox", "jewish"]
+        },
+        "verseCount":  { "type": "integer", "minimum": 1 },
+        "chapterCount": { "type": "integer", "minimum": 1 },
+        "bookCount":   { "type": "integer", "minimum": 1 },
+        "source":      { "type": "string", "description": "Provenance shown in Settings." },
+        "packBytes":   { "type": "integer", "minimum": 0, "description": "Byte size. Always 0 in a pack's own header (placeholder); the real size is in the catalog's version entry." },
+        "original":    { "type": "boolean", "description": "True for Hebrew/Greek original-language versions." },
+        "year":        { "type": ["integer", "null"], "description": "Publication year, or null when unknown." },
+        "asset":       { "type": "string", "description": "Asset path (catalog reader default assets/bible/<id>.json." },
+        "bundled":     { "type": "boolean", "description": "True = shipped in the app binary; false = downloadable on demand." },
+        "notes":       { "type": ["string", "null"] }
+      }
+    },
+    "book": {
+      "type": "object",
+      "required": ["id", "title", "order", "chapters"],
+      "additionalProperties": false,
+      "properties": {
+        "id":    { "type": "string", "description": "USFM book code, e.g. Gen." },
+        "title": { "type": "string" },
+        "order": { "type": "integer", "minimum": 1, "description": "Canonical position 1..N." },
+        "chapters": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/chapter" }
+        }
+      }
+    },
+    "chapter": {
+      "type": "object",
+      "required": ["n", "verses"],
+      "additionalProperties": false,
+      "properties": {
+        "n": { "type": "integer", "minimum": 1 },
+        "verses": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string" },
+          "description": "Verse text; index i = verse i+1 (1-based)."
+        },
+        "headings": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/heading" },
+          "description": "Optional section/Psalm headings; omitted entirely when empty."
+        }
+      }
+    },
+    "heading": {
+      "type": "object",
+      "required": ["t", "v"],
+      "additionalProperties": false,
+      "properties": {
+        "v": { "type": "integer", "minimum": 1, "description": "1-based verse index this heading introduces." },
+        "t": { "type": "string", "description": "Heading text." }
+      }
+    }
+  }
+}
