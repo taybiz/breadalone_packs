@@ -37,9 +37,10 @@ pack files it wants.
 
 ## Pack file format
 
-See [`FORMAT.md`](../FORMAT.md) for the full schema. In short, `format: 1` with a version
-header and a compact `books → chapters → verses` tree, plus optional per-chapter `headings`
-(e.g. the Psalms "BOOK I–V" dividers).
+See [`FORMAT.md`](../FORMAT.md) for the full schema. In short, `format: 2` with a version
+header and a compact `books → chapters → verses` tree, plus a per-chapter `blocks` reading
+layout, optional per-chapter `headings` (e.g. the Psalms "BOOK I–V" dividers), and an
+optional `loose` flag for chapters whose numbering does not map 1:1.
 
 The format is **machine-enforced**: see `schema/` and `tools/validate.py`. CI runs the
 validator on every push, so a malformed pack or a catalog/pack mismatch fails the build

@@ -1,10 +1,10 @@
-# Pack format — `format: 1`
+# Pack format — `format: 2`
 
 A Breadalone **pack** is a single JSON file containing the full text of one Bible version.
 This is the contract every pack source must satisfy. It is deliberately minimal,
 stable, and text-only.
 
-> Format verified against the 30 shipped packs (2026-09-25).
+> Format verified against the 30 shipped packs (`format: 2`, 2026-10-08).
 
 **Machine-enforced schema:** this format is defined as JSON Schema so it can be validated
 automatically (not just documented):
@@ -22,7 +22,7 @@ automatically (not just documented):
 
 ```json
 {
-  "format": 1,
+  "format": 2,
   "version": {
     "id": "kjv",
     "name": "King James Version",
@@ -46,7 +46,7 @@ automatically (not just documented):
 
 | Field | Type | Meaning |
 |---|---|---|
-| `format` | int | **1** (current) |
+| `format` | int | **2** (current) |
 | `id` | string | stable identifier; matches filename `<id>.json` and catalog entry |
 | `name` | string | full version name |
 | `abbr` | string | short abbreviation (e.g. `KJV`) |
@@ -86,6 +86,7 @@ automatically (not just documented):
 ```json
 {
   "n": 1,
+  "blocks": [ { "v": 1, "k": "p" }, { "v": 4, "k": "q" } ],
   "verses": ["...", "..."],
   "headings": [ { "v": 1, "t": "BOOK I" } ]
 }
@@ -94,8 +95,10 @@ automatically (not just documented):
 | Field | Type | Meaning |
 |---|---|---|
 | `n` | int | chapter number (1-based) |
+| `blocks` | array of objects | reading-block layout — see Blocks below |
 | `verses` | array of string | verse text; index `i` = verse `i+1` (1-based) |
 | `headings` | array of objects (optional) | section/Psalm headings; **omitted when empty** |
+| `loose` | bool (optional) | `true` when the chapter's verse numbering is loose; omitted otherwise |
 
 ### Headings
 
@@ -113,7 +116,22 @@ Each heading marks a position within the chapter:
 Present today in ~2,000 headings (notably the Psalms "BOOK I–V" dividers). A chapter
 that has no headings simply omits the `headings` key entirely.
 
-There are **no `blocks`** in the current format — text is plain verse-by-verse.
+### Blocks
+
+`blocks` (added in format 2) records the source's paragraph/poetry layout so a fetched
+edition renders exactly like a bundled one. One entry per block start, in verse order:
+
+```json
+{ "v": 4, "k": "q" }
+```
+
+| Field | Type | Meaning |
+|---|---|---|
+| `v` | int | 1-based verse index this block starts at |
+| `k` | string | block kind — the source's USFM paragraph marker: `p` paragraph, `q` poetry/quote, `m` continuation paragraph, `l` list entry |
+
+Every chapter carries `blocks` in format 2; a chapter with no explicit markers is a
+single `p` block at verse 1.
 
 ---
 
@@ -123,7 +141,7 @@ There are **no `blocks`** in the current format — text is plain verse-by-verse
 - **UTF-8** everywhere. No escapes beyond normal JSON.
 - **Compact output** (the builder emits no indentation) to keep `packBytes` low; but
   whitespace is not part of the contract — any valid JSON with the same structure is valid.
-- **Optional keys omitted when empty.** `headings` (and `version.notes`) only appear
+- **Optional keys omitted when empty.** `headings`, `loose` (and `version.notes`) only appear
   when populated. A reader must tolerate their absence.
 - **Stable ids.** Book ids (`Gen`, `John`…) and version ids are the compatibility
   surface. Do not rename without a format bump.
@@ -132,9 +150,13 @@ There are **no `blocks`** in the current format — text is plain verse-by-verse
 
 ## Versioning
 
-`format: 1` is the current layout. A breaking change to the schema bumps this integer;
+`format: 2` is the current layout. A breaking change to the schema bumps this integer;
 clients that only understand lower formats may refuse or ignore unknown packs. New
 optional fields are additive and should not bump the format.
+
+`format: 1` had no `blocks` — chapters were plain verse-by-verse. The bump to `2` added
+the per-chapter `blocks` reading layout and the optional `loose` flag; a reader that
+advertises format-2 support parses both.
 
 ---
 

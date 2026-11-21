@@ -9,7 +9,7 @@
   "properties": {
     "format": {
       "type": "integer",
-      "const": 1,
+      "const": 2,
       "description": "Pack layout version. Breaking schema changes bump this integer."
     },
     "version": { "$ref": "#/$defs/version" },
@@ -70,10 +70,16 @@
     },
     "chapter": {
       "type": "object",
-      "required": ["n", "verses"],
+      "required": ["n", "blocks", "verses"],
       "additionalProperties": false,
       "properties": {
         "n": { "type": "integer", "minimum": 1 },
+        "blocks": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/block" },
+          "description": "Reading-block layout: one entry per block start, in verse order. Carries the source's paragraph/poetry structure (format 2)."
+        },
         "verses": {
           "type": "array",
           "minItems": 1,
@@ -84,6 +90,23 @@
           "type": "array",
           "items": { "$ref": "#/$defs/heading" },
           "description": "Optional section/Psalm headings; omitted entirely when empty."
+        },
+        "loose": {
+          "type": "boolean",
+          "description": "True when the chapter's verse numbering is loose (its verses do not map 1:1 to the canonical numbers). Omitted when not loose."
+        }
+      }
+    },
+    "block": {
+      "type": "object",
+      "required": ["v", "k"],
+      "additionalProperties": false,
+      "properties": {
+        "v": { "type": "integer", "minimum": 1, "description": "1-based verse index this block starts at." },
+        "k": {
+          "type": "string",
+          "enum": ["p", "q", "m", "l"],
+          "description": "Block kind — the source's USFM paragraph marker: p = paragraph, q = poetry/quote, m = continuation (no first-line indent) paragraph, l = list entry."
         }
       }
     },
