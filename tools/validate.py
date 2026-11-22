@@ -2,7 +2,7 @@
 """Validate every pack and the catalog against the JSON Schemas in schema/.
 
 Exit 0 when everything conforms and the catalog/pack-file sets agree; exit 1
-otherwise. Use as a local gate and in CI:
+otherwise. This is the gate (no hosted CI — bible §2.10):
 
     python3 tools/validate.py
     # -> "30 packs OK, catalog OK"
@@ -66,6 +66,14 @@ def main() -> int:
     for orphan in sorted(packs - ids):
         print(f"FAIL pack file {orphan!r} is not in the catalog")
         failures += 1
+
+    # No hosted CI (bible §2.10): a workflow file is a second definition of the
+    # build that we neither control nor can run locally, so its presence fails.
+    workflows = sorted(glob.glob(os.path.join(ROOT, ".github", "workflows", "*.y*ml")))
+    if workflows:
+        for wf in workflows:
+            print(f"FAIL hosted CI workflow present: {os.path.relpath(wf, ROOT)}")
+        failures += len(workflows)
 
     overlaps = f"(catalog {len(ids)} / packs {len(packs)} agree)" if ids == packs else ""
     print(f"catalog vs packs: {overlaps}")
