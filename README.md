@@ -28,8 +28,8 @@ dart run tools/bible_ingest/bin/bible_ingest.dart --out <path>
 ```
 
 Raw sources live in [`sources/`](sources/PROVENANCE.md) — public domain or freely
-redistributable only, no copyrighted translations. `tools/validate.py` is the local/CI
-validator over the whole tree.
+redistributable only, no copyrighted translations. `tools/validate.py` is the
+validator over the whole tree, run before every push.
 
 ## Where to look
 
